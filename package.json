@@ -1,0 +1,19 @@
+{
+  "name": "openguild",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Open-source community communication platform with servers, channels, realtime messaging and voice features.",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm exec eslint .",
+    "format": "pnpm exec prettier --write .",
+    "format:check": "pnpm exec prettier --check ."
+  },
+  "devDependencies": {
+    "eslint": "^10.4.0",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  }
+}
