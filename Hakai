@@ -1,26 +1,41 @@
 if __name__ == "__main__":
-    data = np.load('power_consumption.npz')
+    data = np.load("power_consumption.npz")
     key = data.files[0]
     power = data[key]
 
-    power = power[700000:1490000]
+    print("Nombre total de samples :", len(power))
 
-    # On inverse la courbe pour transformer les creux en pics
+    # Zone de l'exponentiation rapide
+    start = 700000
+    end = 1490000
+    power = power[start:end]
+
+    print("Zone gardée :", start, end)
+    print("Nombre de samples rognés :", len(power))
+
+    # On inverse la courbe pour transformer les creux en pics positifs
     power *= -1
 
-    peaks, properties = find_peaks(power, height=0.1)
+    # Détection des pics
+    peaks, properties = find_peaks(
+        power,
+        height=0.1
+    )
 
+    print("\n=== DEBUG PICS ===")
     print("Nombre de pics :", len(peaks))
-    print("Premiers pics :", peaks[:20])
+    print("Premiers pics :", peaks[:30])
 
     diffs = np.diff(peaks)
 
-    print("diff entre pics :", diffs[:40])
+    print("\n=== DEBUG DIFFS ENTRE PICS ===")
+    print("diff entre pics :", diffs[:60])
     print("min =", np.min(diffs))
     print("max =", np.max(diffs))
     print("moyenne =", np.mean(diffs))
+    print("percentiles =", np.percentile(diffs, [50, 75, 90, 95, 98, 99]))
 
-    # Les gros écarts marquent la séparation entre deux bits
+    # Un gros gap correspond à une séparation entre deux bits
     gap_threshold = 300
 
     segments = []
@@ -35,22 +50,54 @@ if __name__ == "__main__":
 
     segments.append(current_count)
 
+    print("\n=== DEBUG SEGMENTS ===")
     print("Nombre de segments/bits détectés :", len(segments))
-    print("Pics par segment :", segments[:40])
+    print("Pics par segment, 40 premiers :", segments[:40])
 
-    # D'après le préfixe connu 0x8006f2 :
-    # environ 4/5 pics => bit 0
-    # environ 7 pics => bit 1
+    print("\nDétail des 30 premiers segments :")
+    for i, count in enumerate(segments[:30]):
+        print(f"segment {i:02d} -> {count} pics")
+
+    # Test de plusieurs seuils pour savoir lequel donne le bon début 0x8006f2
+    expected_bits = "100000000000011011110010"
+
+    print("\n=== TEST DES SEUILS ===")
+    print("Bits attendus :", expected_bits)
+    print("Hex attendu  : 8006f2")
+
+    for bit_threshold in range(5, 9):
+        bits_test = ""
+
+        for count in segments:
+            if count >= bit_threshold:
+                bits_test += "1"
+            else:
+                bits_test += "0"
+
+        bits_1024_test = bits_test[:1024]
+        rsa_key_test = hex(int(bits_1024_test, 2))[2:].zfill(256)
+
+        print("\nSeuil count >=", bit_threshold)
+        print("Début bits :", bits_test[:24])
+        print("Début hex  :", rsa_key_test[:6])
+        print("Nb bits    :", len(bits_test))
+
+    # Choisis ici le seuil qui donne 8006f2 dans les tests au-dessus
+    bit_threshold = 7
+
     bits = ""
 
     for count in segments:
-        if count >= 6:
+        if count >= bit_threshold:
             bits += "1"
         else:
             bits += "0"
 
+    print("\n=== CLÉ FINALE ===")
+    print("Seuil utilisé :", bit_threshold)
     print("Nombre de bits :", len(bits))
     print("Début binaire :", bits[:24])
+    print("Début attendu :", expected_bits)
 
     bits_1024 = bits[:1024]
 
@@ -61,6 +108,7 @@ if __name__ == "__main__":
     print("Longueur hex :", len(rsa_key))
     print("Clé hex :", rsa_key)
 
+    print("\n=== CHECK_KEY ===")
     check_key(rsa_key)
 
     print_plot(power)
