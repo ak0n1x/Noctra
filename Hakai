@@ -1,0 +1,66 @@
+if __name__ == "__main__":
+    data = np.load('power_consumption.npz')
+    key = data.files[0]
+    power = data[key]
+
+    power = power[700000:1490000]
+
+    # On inverse la courbe pour transformer les creux en pics
+    power *= -1
+
+    peaks, properties = find_peaks(power, height=0.1)
+
+    print("Nombre de pics :", len(peaks))
+    print("Premiers pics :", peaks[:20])
+
+    diffs = np.diff(peaks)
+
+    print("diff entre pics :", diffs[:40])
+    print("min =", np.min(diffs))
+    print("max =", np.max(diffs))
+    print("moyenne =", np.mean(diffs))
+
+    # Les gros écarts marquent la séparation entre deux bits
+    gap_threshold = 300
+
+    segments = []
+    current_count = 1
+
+    for gap in diffs:
+        if gap > gap_threshold:
+            segments.append(current_count)
+            current_count = 1
+        else:
+            current_count += 1
+
+    segments.append(current_count)
+
+    print("Nombre de segments/bits détectés :", len(segments))
+    print("Pics par segment :", segments[:40])
+
+    # D'après le préfixe connu 0x8006f2 :
+    # environ 4/5 pics => bit 0
+    # environ 7 pics => bit 1
+    bits = ""
+
+    for count in segments:
+        if count >= 6:
+            bits += "1"
+        else:
+            bits += "0"
+
+    print("Nombre de bits :", len(bits))
+    print("Début binaire :", bits[:24])
+
+    bits_1024 = bits[:1024]
+
+    rsa_key = hex(int(bits_1024, 2))[2:]
+    rsa_key = rsa_key.zfill(256)
+
+    print("Début hex :", rsa_key[:6])
+    print("Longueur hex :", len(rsa_key))
+    print("Clé hex :", rsa_key)
+
+    check_key(rsa_key)
+
+    print_plot(power)
