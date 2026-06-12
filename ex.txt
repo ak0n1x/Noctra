@@ -1,0 +1,92 @@
+Intitulé
+En ayant positionné une sonde de consommation de courant sur le rail d'alimentation d'un
+SoC, vous avez pu récupérer cette courbe de consommation. Elle est stockée dans le fichier
+power_consumption.npz .
+Nous savons que cette capture a été prise durant un calcul Square & Multiply (aussi connu
+sous le nom d'exponentiation rapide) de RSA lors d'un chiffrement. Comme vu en cours, ce
+calcul est différencié en fonction de chaque bit de clé et le traitement du bit se trouve fuiter
+dans la consommation de courant. Ce TP vise à retrouver la clé à partir de la courbe de
+consommation.
+. Chargez le fichier npz avec le script fourni et observez la courbe de consommation dans
+votre navigateur dans votre navigateur. Vous pouvez la parcourir et zoomer!
+2. Identifiez la zone de l'opération d'exponentiation rapide
+Vous devriez avoir deux motifs répétés.
+Le tableau power est un tableau en une dimension, l'index est le numéro du sample
+et la valeur est la mesure de consommation à cet instant.
+Rognez votre tableau pour ne garder que les samples durant l'opération
+3. Retrouvez la clé!
+. Les premier bits à trouver sont: 0x8006f2 dans l'ordre d'acquisition
+2. La clé a 1024 bits!
+3. La fonction from scipy.signal import find_peaks vous sera très utile.
+4. Je vous conseille une approche itérative qui va permettre de se recaler sur
+chaque motif
+. Prenez une fenêtre arbitraire à partir du premier pic, et identifiez les pics avant
+une absence de signal.
+2. Une absence de signal marque une séparation entre le traitements de deux
+bits.
+3. Comptez le nombre de pics avant l'absence de signal et réitérez au premier
+pic se trouvant après l'absence de signal
+4. Vérifiez votre clé en la formattant sous forme de hexstring et en appelant la fonction
+check_key . Si elle est correcte, elle vous affichera le flag!
+5. Proposez une solution sûre pour éviter cette attaque
+
+
+(tp_rsa_spa) laye18@LAYE:/mnt/c/Users/konea/Documents/seculog/tp3_RSA_SPA/tp_rsa_spa$ cat tp3_rsa.py 
+import numpy as np
+import plotly.graph_objects as go
+from scipy.signal import find_peaks
+import hashlib
+from Crypto.Cipher import AES
+
+def check_key(rsa_key:str):
+    # On attend une hexstring de la clé RSA
+    if not rsa_key.startswith('8006f2'):
+        print("Invalid key")
+        return
+
+    sha256 = hashlib.sha256()
+    sha256.update(rsa_key.encode())
+    aes_key = sha256.digest()
+
+    ciphertext = bytes.fromhex('49e3bad170873451c0355df16f93fec5ec0b1bb353cb0ebb67045f26966e5aae')
+
+    aes = AES.new(aes_key, AES.MODE_ECB)
+    plaintext = aes.decrypt(ciphertext)
+    # Vous devriez obtenir une phrase lisible
+    print(plaintext)
+
+def print_plot(power, output_file='power_consumption_debug.html'):
+    fig = go.Figure()
+
+    fig.add_trace(go.Scattergl(
+        y=power,
+        mode='lines',
+        name='Power Consumption',
+        line=dict(width=1),
+        hovertemplate='Sample: %{x}<br>Power: %{y:.6f}<extra></extra>'
+    ))
+
+    fig.update_layout(
+        title='Power Consumption Trace',
+        xaxis_title='Sample',
+        yaxis_title='Power Consumption',
+        hovermode='closest',
+        template='plotly_white',
+        height=600,
+        xaxis=dict(
+            rangeslider=dict(visible=True),
+            type='linear'
+        )
+    )
+
+    print("Saving plot to", output_file)
+    fig.write_html(output_file, config={'scrollZoom': True})
+
+
+if __name__ == "__main__":
+    # Load the power consumption data
+    data = np.load('power_consumption.npz')
+    key = data.files[0]
+    power = data[key]
+
+    print_plot(power)(tp_rsa_spa) laye18@LAYE:/mnt/c/Users/konea/Documents/seculog/tp3_RSA_SPA/tp_rsa_spa$ 
