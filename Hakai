@@ -1,114 +1,60 @@
-if __name__ == "__main__":
-    data = np.load("power_consumption.npz")
-    key = data.files[0]
-    power = data[key]
+power *= -1
 
-    print("Nombre total de samples :", len(power))
+height_value = np.mean(power) + np.std(power)
 
-    # Zone de l'exponentiation rapide
-    start = 700000
-    end = 1490000
-    power = power[start:end]
+peaks, properties = find_peaks(
+    power,
+    height=height_value,
+    distance=20
+)
 
-    print("Zone gardée :", start, end)
-    print("Nombre de samples rognés :", len(power))
+print("Height utilisé :", height_value)
+print("Nombre de pics :", len(peaks))
+print("Premiers pics :", peaks[:20])
 
-    # On inverse la courbe pour transformer les creux en pics positifs
-    power *= -1
+diffs = np.diff(peaks)
 
-    # Détection des pics
-    peaks, properties = find_peaks(
-        power,
-        height=0.1
-    )
+print("diff entre pics :", diffs[:60])
+print("min =", np.min(diffs))
+print("max =", np.max(diffs))
+print("moyenne =", np.mean(diffs))
+print("percentiles =", np.percentile(diffs, [50, 90, 95, 98, 99]))
 
-    print("\n=== DEBUG PICS ===")
-    print("Nombre de pics :", len(peaks))
-    print("Premiers pics :", peaks[:30])
+gap_threshold = 200
 
-    diffs = np.diff(peaks)
+segments = []
+current_count = 1
 
-    print("\n=== DEBUG DIFFS ENTRE PICS ===")
-    print("diff entre pics :", diffs[:60])
-    print("min =", np.min(diffs))
-    print("max =", np.max(diffs))
-    print("moyenne =", np.mean(diffs))
-    print("percentiles =", np.percentile(diffs, [50, 75, 90, 95, 98, 99]))
+for gap in diffs:
+    if gap > gap_threshold:
+        segments.append(current_count)
+        current_count = 1
+    else:
+        current_count += 1
 
-    # Un gros gap correspond à une séparation entre deux bits
-    gap_threshold = 300
+segments.append(current_count)
 
-    segments = []
-    current_count = 1
+print("Nombre de segments/bits détectés :", len(segments))
+print("Pics par segment, 40 premiers :", segments[:40])
 
-    for gap in diffs:
-        if gap > gap_threshold:
-            segments.append(current_count)
-            current_count = 1
-        else:
-            current_count += 1
+bits = ""
 
-    segments.append(current_count)
+for count in segments:
+    if count >= 13:
+        bits += "1"
+    else:
+        bits += "0"
 
-    print("\n=== DEBUG SEGMENTS ===")
-    print("Nombre de segments/bits détectés :", len(segments))
-    print("Pics par segment, 40 premiers :", segments[:40])
+print("Nombre de bits :", len(bits))
+print("Début binaire :", bits[:24])
+print("Début attendu :", "100000000000011011110010")
 
-    print("\nDétail des 30 premiers segments :")
-    for i, count in enumerate(segments[:30]):
-        print(f"segment {i:02d} -> {count} pics")
+bits_1024 = bits[:1024]
 
-    # Test de plusieurs seuils pour savoir lequel donne le bon début 0x8006f2
-    expected_bits = "100000000000011011110010"
+rsa_key = hex(int(bits_1024, 2))[2:].zfill(256)
 
-    print("\n=== TEST DES SEUILS ===")
-    print("Bits attendus :", expected_bits)
-    print("Hex attendu  : 8006f2")
+print("Début hex :", rsa_key[:6])
+print("Longueur hex :", len(rsa_key))
+print("Clé hex :", rsa_key)
 
-    for bit_threshold in range(5, 9):
-        bits_test = ""
-
-        for count in segments:
-            if count >= bit_threshold:
-                bits_test += "1"
-            else:
-                bits_test += "0"
-
-        bits_1024_test = bits_test[:1024]
-        rsa_key_test = hex(int(bits_1024_test, 2))[2:].zfill(256)
-
-        print("\nSeuil count >=", bit_threshold)
-        print("Début bits :", bits_test[:24])
-        print("Début hex  :", rsa_key_test[:6])
-        print("Nb bits    :", len(bits_test))
-
-    # Choisis ici le seuil qui donne 8006f2 dans les tests au-dessus
-    bit_threshold = 7
-
-    bits = ""
-
-    for count in segments:
-        if count >= bit_threshold:
-            bits += "1"
-        else:
-            bits += "0"
-
-    print("\n=== CLÉ FINALE ===")
-    print("Seuil utilisé :", bit_threshold)
-    print("Nombre de bits :", len(bits))
-    print("Début binaire :", bits[:24])
-    print("Début attendu :", expected_bits)
-
-    bits_1024 = bits[:1024]
-
-    rsa_key = hex(int(bits_1024, 2))[2:]
-    rsa_key = rsa_key.zfill(256)
-
-    print("Début hex :", rsa_key[:6])
-    print("Longueur hex :", len(rsa_key))
-    print("Clé hex :", rsa_key)
-
-    print("\n=== CHECK_KEY ===")
-    check_key(rsa_key)
-
-    print_plot(power)
+check_key(rsa_key)
