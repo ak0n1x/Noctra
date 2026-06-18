@@ -1,60 +1,165 @@
-power *= -1
 
-height_value = np.mean(power) + np.std(power)
+Oui, on fait Step 03 et Step 04, donc la multiplication matricielle GPU naïve.
 
-peaks, properties = find_peaks(
-    power,
-    height=height_value,
-    distance=20
-)
+Ici l’idée est simple : chaque thread CUDA calcule une seule case de la matrice C.
 
-print("Height utilisé :", height_value)
-print("Nombre de pics :", len(peaks))
-print("Premiers pics :", peaks[:20])
+On veut calculer :
 
-diffs = np.diff(peaks)
+C = A * B
 
-print("diff entre pics :", diffs[:60])
-print("min =", np.min(diffs))
-print("max =", np.max(diffs))
-print("moyenne =", np.mean(diffs))
-print("percentiles =", np.percentile(diffs, [50, 90, 95, 98, 99]))
+avec :
 
-gap_threshold = 200
+A : N × M
+B : M × P
+C : N × P
 
-segments = []
-current_count = 1
+Pour une case C[i][j] :
 
-for gap in diffs:
-    if gap > gap_threshold:
-        segments.append(current_count)
-        current_count = 1
-    else:
-        current_count += 1
+C[i][j] = somme pour k de A[i][k] * B[k][j]
 
-segments.append(current_count)
+⸻
 
-print("Nombre de segments/bits détectés :", len(segments))
-print("Pics par segment, 40 premiers :", segments[:40])
+Step 03 — kernel CUDA matmul2
 
-bits = ""
+Dans ton matrix.cu, complète le kernel comme ça :
 
-for count in segments:
-    if count >= 13:
-        bits += "1"
-    else:
-        bits += "0"
+namespace kernel {
+//
+// step 03
+//
+__global__
+void matmul2(const int* A, const int* B, int* C, int N, int M, int P)
+{
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    if (i < N && j < P)
+    {
+        int sum = 0;
+        for (int k = 0; k < M; ++k)
+        {
+            sum += A[index1(i, k, N, M)] * B[index1(k, j, M, P)];
+        }
+        C[index1(i, j, N, P)] = sum;
+    }
+}
+} // namespace kernel
 
-print("Nombre de bits :", len(bits))
-print("Début binaire :", bits[:24])
-print("Début attendu :", "100000000000011011110010")
+Explication rapide
 
-bits_1024 = bits[:1024]
+On utilise une grille 2D :
 
-rsa_key = hex(int(bits_1024, 2))[2:].zfill(256)
+int j = blockIdx.x * blockDim.x + threadIdx.x;
+int i = blockIdx.y * blockDim.y + threadIdx.y;
 
-print("Début hex :", rsa_key[:6])
-print("Longueur hex :", len(rsa_key))
-print("Clé hex :", rsa_key)
+Ici :
 
-check_key(rsa_key)
+j = colonne de C
+i = ligne de C
+
+Donc chaque thread calcule une case :
+
+C[i][j]
+
+Le if protège les bords :
+
+if (i < N && j < P)
+
+parce qu’on peut lancer plus de threads que nécessaire si N ou P ne sont pas multiples de T = 16.
+
+⸻
+
+Step 04 — fonction host matmul2
+
+Maintenant il faut compléter la fonction CPU qui prépare le GPU :
+
+std::vector<int> matmul2(...)
+
+Elle doit :
+
+1. allouer A, B, C sur le GPU ;
+2. copier A et B vers le GPU ;
+3. lancer le kernel ;
+4. récupérer C ;
+5. libérer la mémoire GPU.
+
+Mets ça :
+
+std::vector<int> matmul2(
+    const std::vector<int>& A,
+    const std::vector<int>& B,
+    int N, int M, int P)
+{
+    //
+    // step 04
+    //
+    std::vector<int> C(N * P);
+    int* dA;
+    int* dB;
+    int* dC;
+    CUDA_CHECK(cudaMalloc(&dA, N * M * sizeof(int)));
+    CUDA_CHECK(cudaMalloc(&dB, M * P * sizeof(int)));
+    CUDA_CHECK(cudaMalloc(&dC, N * P * sizeof(int)));
+    CUDA_CHECK(cudaMemcpy(dA, A.data(), N * M * sizeof(int), cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(dB, B.data(), M * P * sizeof(int), cudaMemcpyHostToDevice));
+    const dim3 threads(T, T, 1);
+    const dim3 blocs(
+        (P + T - 1) / T,
+        (N + T - 1) / T,
+        1
+    );
+    kernel::matmul2<<<blocs, threads>>>(dA, dB, dC, N, M, P);
+    CUDA_CHECK(cudaGetLastError());
+    CUDA_CHECK(cudaDeviceSynchronize());
+    CUDA_CHECK(cudaMemcpy(C.data(), dC, N * P * sizeof(int), cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaFree(dA));
+    CUDA_CHECK(cudaFree(dB));
+    CUDA_CHECK(cudaFree(dC));
+    return C;
+}
+
+⸻
+
+Pourquoi les blocs sont calculés comme ça ?
+
+La matrice résultat C a une taille :
+
+N lignes × P colonnes
+
+Les threads sont organisés en blocs de :
+
+T × T = 16 × 16
+
+Donc pour couvrir les colonnes de C, on fait :
+
+(P + T - 1) / T
+
+Et pour couvrir les lignes :
+
+(N + T - 1) / T
+
+Donc :
+
+const dim3 blocs(
+    (P + T - 1) / T,
+    (N + T - 1) / T,
+    1
+);
+
+Pourquoi P en premier ?
+Parce que blockIdx.x correspond aux colonnes, donc à j.
+Pourquoi N en deuxième ?
+Parce que blockIdx.y correspond aux lignes, donc à i.
+
+⸻
+
+À tester
+
+Compile :
+
+nvcc main.cu matrix.cu -o exec
+
+Puis lance :
+
+./exec
+
+Si ton main.cu teste aussi matmul3, ça peut encore échouer parce que les steps 5, 6, 7 ne sont pas faits. Mais matmul2 sera bon.
