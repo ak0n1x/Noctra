@@ -1,11 +1,17 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { createValidationPipe } from "./validation";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(createValidationPipe());
   app.enableShutdownHooks();
-  await app.listen(process.env.PORT ?? 3001, "127.0.0.1");
+  const port = Number(process.env.API_PORT ?? process.env.PORT ?? 3001);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("API_PORT (or PORT) must be an integer between 1 and 65535.");
+  }
+  await app.listen(port, "127.0.0.1");
 }
 
 bootstrap().catch((error: unknown) => {
