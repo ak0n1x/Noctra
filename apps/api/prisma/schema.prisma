@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile      Profile?
+  ownedServers Server[]       @relation("ServerOwner")
+  memberships  ServerMember[]
+  messages     Message[]
+  invitations  Invitation[]   @relation("InvitationCreator")
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  username    String   @unique
+  displayName String?
+  avatarUrl   String?
+  bio         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Server {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  iconUrl     String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User           @relation("ServerOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     ServerMember[]
+  channels    Channel[]
+  invitations Invitation[]
+
+  @@index([ownerId])
+}
+
+enum ServerRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model ServerMember {
+  id       String     @id @default(uuid())
+  userId   String
+  serverId String
+  role     ServerRole @default(MEMBER)
+  joinedAt DateTime   @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serverId])
+  @@index([serverId])
+  @@index([userId])
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+}
+
+model Channel {
+  id        String      @id @default(uuid())
+  serverId  String
+  name      String
+  type      ChannelType @default(TEXT)
+  position  Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([serverId, name])
+  @@index([serverId])
+}
+
+model Message {
+  id        String    @id @default(uuid())
+  channelId String
+  authorId  String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([channelId, createdAt])
+  @@index([authorId])
+}
+
+model Invitation {
+  id          String    @id @default(uuid())
+  serverId    String
+  code        String    @unique
+  createdById String
+  expiresAt   DateTime?
+  maxUses     Int?
+  usesCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  server    Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  createdBy User   @relation("InvitationCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([serverId])
+  @@index([createdById])
+}

@@ -12,6 +12,9 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:api": "pnpm --filter api dev",
+    "db:generate": "pnpm --filter api prisma:generate",
+    "db:migrate": "pnpm --filter api prisma:migrate",
+    "db:studio": "pnpm --filter api prisma:studio",
     "build": "pnpm --filter web build && pnpm --filter api build",
     "typecheck": "pnpm --filter web exec tsc --noEmit && pnpm --filter api typecheck",
     "lint": "pnpm --filter web lint && pnpm --filter api lint",
