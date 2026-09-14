@@ -26,6 +26,11 @@ and run `pnpm db:migrate --name init` locally.
 
 ## Version 0.2 — Authentication
 
+Status: initial backend registration, login and JWT-protected current-user endpoint
+are implemented with Argon2id, strict DTO validation and isolated HTTP tests. Live
+database verification still requires valid local credentials and the initial migration.
+Refresh tokens, logout revocation and rate limiting remain planned.
+
 Planned features:
 
 - user registration;

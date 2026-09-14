@@ -40,7 +40,7 @@ is seeded. See [Secrets Management](./docs/security/secrets-management.md).
 
 The following features are not implemented yet:
 
-- authentication;
+- refresh tokens and individual token revocation;
 - authorization;
 - role-based permissions;
 - rate limiting;
@@ -54,7 +54,11 @@ Because of this, OpenGuild should not be deployed publicly yet.
 
 ## Authentication requirements
 
-When authentication is implemented, the project should follow these rules:
+Initial authentication uses Argon2id, strict DTO validation and JWT-protected routes.
+Login errors are generic; JWT configuration is validated at startup. Rate limiting
+and refresh tokens are not implemented. See [Authentication Security](./docs/security/authentication.md).
+
+The project should continue to follow these rules:
 
 - passwords must never be stored in plain text;
 - passwords should be hashed with a secure password hashing algorithm such as Argon2 or bcrypt;

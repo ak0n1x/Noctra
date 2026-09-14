@@ -22,7 +22,7 @@ The project aims to provide:
 
 The monorepo foundation includes a Next.js frontend in `apps/web` and a NestJS backend
 in `apps/api`. PostgreSQL and Prisma are configured with an initial domain schema.
-Authentication and messaging endpoints are not implemented yet.
+Initial JWT authentication is implemented in the API. Messaging endpoints remain planned.
 
 No stable release is available yet.
 
@@ -70,6 +70,8 @@ Main documentation files:
 - [API architecture overview](./docs/architecture/api-overview.md)
 - [Database schema](./docs/architecture/database-schema.md)
 - [Secrets management](./docs/security/secrets-management.md)
+- [Authentication flow](./docs/architecture/authentication-flow.md)
+- [Authentication security](./docs/security/authentication.md)
 
 ## Development
 
@@ -146,6 +148,18 @@ pnpm db:migrate --name init
 The development role needs permission to create a shadow database. Review and commit
 the generated migrations. Use `pnpm db:studio` to inspect local data. This foundation
 is not production-ready; see the [schema documentation](./docs/architecture/database-schema.md).
+
+## Authentication
+
+The API exposes `POST /auth/register`, `POST /auth/login` and protected `GET /auth/me`.
+Configure `JWT_ACCESS_SECRET` with a random secret of at least 32 characters and
+`JWT_ACCESS_EXPIRES_IN` (default `15m`) in your environment. The example secret must
+be replaced before starting the API. A migrated PostgreSQL database is also required.
+
+Run `pnpm --filter api test` for isolated authentication tests. See the
+[authentication flow](./docs/architecture/authentication-flow.md) for curl examples,
+secret generation and current limitations. Refresh tokens, rate limiting and frontend
+authentication are not implemented yet.
 
 ## Contributing
 
