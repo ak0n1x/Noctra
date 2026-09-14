@@ -12,6 +12,9 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:api": "pnpm --filter api dev",
+    "db:up": "docker compose up -d --wait postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
     "db:generate": "pnpm --filter api prisma:generate",
     "db:migrate": "pnpm --filter api prisma:migrate",
     "db:studio": "pnpm --filter api prisma:studio",
