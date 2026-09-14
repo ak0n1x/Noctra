@@ -15,7 +15,14 @@ Goals:
 - choose and document the open-source license;
 - prepare the project for future frontend and backend apps.
 
-Status: in progress.
+Status: the Next.js frontend (`apps/web`), NestJS backend (`apps/api`) and shared
+monorepo commands are initialized. PostgreSQL and Prisma are configured with the
+initial seven-model schema and NestJS connection lifecycle. Authentication is next.
+
+Phase 2 status: client generation and schema validation are configured. The initial
+migration remains pending: local PostgreSQL rejected the example credentials during
+setup, so no migration was created or applied. Configure a development `DATABASE_URL`
+and run `pnpm db:migrate --name init` locally.
 
 ## Version 0.2 — Authentication
 

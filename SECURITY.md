@@ -34,6 +34,10 @@ OpenGuild aims to progressively implement the following security measures:
 
 At this stage, the project is in its initial setup phase.
 
+The database foundation uses `DATABASE_URL` for PostgreSQL credentials. Never commit
+the real `.env`; `.env.example` contains local examples only. No real sensitive data
+is seeded. See [Secrets Management](./docs/security/secrets-management.md).
+
 The following features are not implemented yet:
 
 - authentication;

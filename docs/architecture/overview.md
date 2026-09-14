@@ -31,7 +31,8 @@ Location:
 apps/web
 ```
 
-The web application contains the user interface.
+The web application contains the Next.js user interface. Its minimal application
+shell is initialized; the responsibilities below are planned.
 
 Planned responsibilities:
 
@@ -59,7 +60,9 @@ Location:
 apps/api
 ```
 
-The API application contains the backend logic.
+The API application contains the NestJS backend logic. The initial backend phase
+is in progress. See [API Architecture Overview](./api-overview.md) for the current
+setup, module plan and security boundaries.
 
 Planned responsibilities:
 
@@ -487,8 +490,7 @@ Current focus:
 
 Next planned technical steps:
 
-- initialize the frontend application;
-- initialize the backend application;
-- configure PostgreSQL and Prisma;
-- design the first database schema;
+- expand the initialized Next.js frontend;
+- develop the initialized NestJS backend;
+- apply and evolve the [initial PostgreSQL and Prisma schema](./database-schema.md);
 - implement authentication.

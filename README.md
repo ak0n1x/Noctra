@@ -20,7 +20,9 @@ The project aims to provide:
 
 ## Project status
 
-This project is currently in its early planning and architecture phase.
+The monorepo foundation includes a Next.js frontend in `apps/web` and a NestJS backend
+in `apps/api`. PostgreSQL and Prisma are configured with an initial domain schema.
+Authentication and messaging endpoints are not implemented yet.
 
 No stable release is available yet.
 
@@ -65,8 +67,15 @@ Main documentation files:
 - [Contributing guide](./CONTRIBUTING.md)
 - [Security policy](./SECURITY.md)
 - [Architecture overview](./docs/architecture/overview.md)
+- [API architecture overview](./docs/architecture/api-overview.md)
+- [Database schema](./docs/architecture/database-schema.md)
+- [Secrets management](./docs/security/secrets-management.md)
 
 ## Development
+
+Use Node.js 24.15 or later in the 24.x LTS line and the pnpm version pinned in
+`package.json`. All installation commands run from the repository root, which owns
+the only workspace configuration and lockfile.
 
 Install dependencies:
 
@@ -91,6 +100,52 @@ Run linting:
 ```bash
 pnpm lint
 ```
+
+Check types and build both applications:
+
+```bash
+pnpm typecheck
+pnpm build
+```
+
+Run the applications in separate terminals:
+
+```bash
+pnpm dev:web
+pnpm dev:api
+```
+
+The frontend is available at <http://localhost:3000> and the API at
+<http://127.0.0.1:3001>. Set `API_PORT` to override the API port; `PORT` remains a
+fallback. The API now requires a reachable PostgreSQL database at startup.
+
+## Database
+
+OpenGuild uses PostgreSQL and Prisma. Create a local PostgreSQL database and role,
+then copy the example configuration and adjust its development credentials:
+
+```bash
+cp .env.example .env
+```
+
+On PowerShell, use `Copy-Item .env.example .env`. Never commit `.env`.
+Both the API and database scripts load this root file.
+
+Generate the client without a running database:
+
+```bash
+pnpm db:generate
+```
+
+Run migrations when PostgreSQL is available:
+
+```bash
+pnpm db:migrate --name init
+```
+
+The development role needs permission to create a shadow database. Review and commit
+the generated migrations. Use `pnpm db:studio` to inspect local data. This foundation
+is not production-ready; see the [schema documentation](./docs/architecture/database-schema.md).
 
 ## Contributing
 
