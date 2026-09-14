@@ -19,8 +19,8 @@ with missing, short or placeholder secrets or an invalid token lifetime. No secr
 is needed to build the applications or run the isolated authentication tests.
 
 Run `pnpm db:migrate --name init` against a configured development database before
-using authentication, then `pnpm dev:api`. The database migration remains pending
-in the repository; see [Database Schema](./database-schema.md).
+using authentication, then `pnpm dev:api`. The initial migration is included in
+the repository; see [Local Development](./local-development.md).
 
 ## Registration
 

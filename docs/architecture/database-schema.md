@@ -47,7 +47,7 @@ future queries must explicitly filter soft-deleted messages.
 ## Constraints and indexes
 
 - Email and username are unique. Uniqueness is case-sensitive with the initial
-  PostgreSQL string columns; authentication must define normalization rules.
+  PostgreSQL string columns; authentication normalizes both to lowercase before writes.
 - `Profile.userId` is unique, enforcing at most one profile per user.
 - `(userId, serverId)` prevents duplicate memberships.
 - `(serverId, name)` prevents duplicate channel names within a server.
@@ -84,11 +84,11 @@ command against production or accept a reset of a database containing useful dat
 
 ## Current limitations
 
-No initial migration has been created or applied yet: the local PostgreSQL server
-rejected the example credentials during setup. Configure your own development
-connection and run `pnpm db:migrate --name init` to create and apply it.
+The initial migration is versioned in `apps/api/prisma/migrations` and has been
+applied to the local Docker PostgreSQL database. New checkouts must run
+`pnpm db:migrate` against their own development database.
 
-The schema is an initial version. Authentication and domain endpoints are not
-implemented. It does not yet include refresh tokens, password reset tokens, email
+The schema is an initial version. Initial authentication uses User and Profile;
+other domain endpoints are not implemented. It does not yet include refresh tokens, password reset tokens, email
 verification, custom roles, granular permissions, attachments, audit logs, bans or
 voice sessions. It is not production-ready.

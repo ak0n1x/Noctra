@@ -53,15 +53,18 @@ not implemented by the initial scaffold.
 
 ## Current status
 
-The API is in its initial setup phase. `AppModule`, `AppController` and `AppService`
-provide only `GET /`, returning `{ "name": "OpenGuild API", "status": "ok" }`.
+The API includes the database foundation and initial JWT authentication.
+`AppController` and `AppService` still provide `GET /`, returning
+`{ "name": "OpenGuild API", "status": "ok" }`, alongside the authentication endpoints.
 This is a process status endpoint, not a database readiness check.
 
 Run `pnpm dev:api` from the repository root. The API binds to `127.0.0.1:3001` by
 default; `API_PORT` overrides the port, with `PORT` as a fallback. The frontend uses
 port 3000. `ConfigModule` loads the root `.env`; `PrismaModule` provides a shared
 `PrismaService` that connects to PostgreSQL on startup and disconnects on shutdown.
-A configured, reachable database is required to start the API. Migrations are run
-explicitly, not at startup. Authentication and realtime features remain planned.
+A configured, reachable database and valid JWT secret are required to start the API.
+Migrations are run explicitly, not at startup. Initial authentication is implemented
+in AuthModule and UsersModule; realtime features remain planned. See
+[Authentication Flow](./authentication-flow.md).
 
 See [Database Schema](./database-schema.md) for models and migration commands.

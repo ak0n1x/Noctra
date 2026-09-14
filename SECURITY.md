@@ -38,6 +38,10 @@ The database foundation uses `DATABASE_URL` for PostgreSQL credentials. Never co
 the real `.env`; `.env.example` contains local examples only. No real sensitive data
 is seeded. See [Secrets Management](./docs/security/secrets-management.md).
 
+Docker Compose provides local development PostgreSQL on loopback port 5433 with
+example credentials. This setup must not be used for production. Keep the real
+`.env` ignored and use separate credentials for deployed environments.
+
 The following features are not implemented yet:
 
 - refresh tokens and individual token revocation;

@@ -17,18 +17,17 @@ Goals:
 
 Status: the Next.js frontend (`apps/web`), NestJS backend (`apps/api`) and shared
 monorepo commands are initialized. PostgreSQL and Prisma are configured with the
-initial seven-model schema and NestJS connection lifecycle. Authentication is next.
+initial seven-model schema and NestJS connection lifecycle. Initial authentication is implemented.
 
-Phase 2 status: client generation and schema validation are configured. The initial
-migration remains pending: local PostgreSQL rejected the example credentials during
-setup, so no migration was created or applied. Configure a development `DATABASE_URL`
-and run `pnpm db:migrate --name init` locally.
+Phase 2 status: client generation, schema validation and the initial migration are
+implemented. The migration has been applied to the local Docker PostgreSQL database.
+See [Local Development](./docs/architecture/local-development.md) for setup.
 
 ## Version 0.2 — Authentication
 
 Status: initial backend registration, login and JWT-protected current-user endpoint
-are implemented with Argon2id, strict DTO validation and isolated HTTP tests. Live
-database verification still requires valid local credentials and the initial migration.
+are implemented with Argon2id, strict DTO validation and isolated HTTP tests. The
+registration, login and current-user flow has also been verified against Docker PostgreSQL.
 Refresh tokens, logout revocation and rate limiting remain planned.
 
 Planned features:

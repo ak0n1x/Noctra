@@ -123,6 +123,20 @@ fallback. The API now requires a reachable PostgreSQL database at startup.
 
 ## Database
 
+For a reproducible local PostgreSQL instance, start Docker Desktop and follow
+[Local Development](./docs/architecture/local-development.md). If `.env` does not
+exist yet, copy `.env.example` to `.env` and replace the JWT secret placeholder.
+
+```bash
+pnpm db:up
+pnpm db:generate
+pnpm db:migrate --name init
+pnpm dev:api
+```
+
+Use `pnpm db:down` to stop PostgreSQL while preserving its data, or `pnpm db:logs`
+to inspect logs. Port conflicts and Windows/WSL setup are covered in the guide.
+
 OpenGuild uses PostgreSQL and Prisma. Create a local PostgreSQL database and role,
 then copy the example configuration and adjust its development credentials:
 
