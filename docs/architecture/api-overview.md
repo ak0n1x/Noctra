@@ -1,6 +1,6 @@
 # API Architecture Overview
 
-The `apps/api` application contains the backend logic of OpenGuild. It uses NestJS and
+The `apps/api` application contains the backend logic of Noctra. It uses NestJS and
 TypeScript: modules, dependency injection and controllers provide a consistent structure
 as the project grows.
 
@@ -55,7 +55,7 @@ not implemented by the initial scaffold.
 
 The API includes the database foundation and initial JWT authentication.
 `AppController` and `AppService` still provide `GET /`, returning
-`{ "name": "OpenGuild API", "status": "ok" }`, alongside the authentication endpoints.
+`{ "name": "Noctra API", "status": "ok" }`, alongside the authentication endpoints.
 This is a process status endpoint, not a database readiness check.
 
 Run `pnpm dev:api` from the repository root. The API binds to `127.0.0.1:3001` by

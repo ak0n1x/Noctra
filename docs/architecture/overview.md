@@ -1,17 +1,17 @@
 # Architecture Overview
 
-OpenGuild is designed as a modular open-source communication platform.
+Noctra is designed as a modular open-source communication platform.
 
 The goal is to keep the project understandable, maintainable and extensible for contributors.
 
-OpenGuild is not intended to be a full Discord clone. It aims to provide a smaller and documented alternative focused on servers, channels, realtime messaging and, later, voice rooms.
+Noctra is not intended to be a full Discord clone. It aims to provide a smaller and documented alternative focused on servers, channels, realtime messaging and, later, voice rooms.
 
 ## High-level architecture
 
 The project is organized as a monorepo.
 
 ```txt
-openguild/
+noctra/
 ├── apps/
 │   ├── web/
 │   └── api/
@@ -465,7 +465,7 @@ These may be explored later, but they should not block the first usable version.
 
 ## Architecture principles
 
-OpenGuild should follow these principles:
+Noctra should follow these principles:
 
 - keep the code understandable;
 - keep features small and documented;

@@ -3,6 +3,6 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class AppService {
   getStatus() {
-    return { name: "OpenGuild API", status: "ok" };
+    return { name: "Noctra API", status: "ok" };
   }
 }

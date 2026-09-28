@@ -1,8 +1,8 @@
 # Roadmap
 
-This roadmap describes the planned evolution of OpenGuild.
+This roadmap describes the planned evolution of Noctra.
 
-The goal is to build the project progressively, starting with a small but solid MVP. OpenGuild is not intended to be a full Discord clone, but a clear, documented and extensible open-source communication platform.
+The goal is to build the project progressively, starting with a small but solid MVP. Noctra is not intended to be a full Discord clone, but a clear, documented and extensible open-source communication platform.
 
 ## Version 0.1 — Project foundation
 
@@ -266,7 +266,7 @@ These features are not part of the first MVP:
 
 ## Known non-goals
 
-OpenGuild does not aim to:
+Noctra does not aim to:
 
 - fully clone Discord;
 - provide all enterprise-grade features from day one;

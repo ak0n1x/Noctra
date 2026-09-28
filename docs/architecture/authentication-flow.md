@@ -52,7 +52,7 @@ Successful login returns HTTP 200 with the same response shape as registration.
 ## JWT and protected routes
 
 An access token contains the user ID as `sub`, issuance and expiration timestamps,
-issuer `openguild-api` and audience `openguild`. It is signed with HS256. Tokens do
+and the existing issuer and audience claims, retained for token compatibility. It is signed with HS256. Tokens do
 not contain email, password hashes or authorization roles.
 
 `JwtAuthGuard` delegates to `JwtStrategy`, which accepts a token only from

@@ -1,6 +1,6 @@
-# OpenGuild
+# Noctra
 
-OpenGuild is an open-source community communication platform inspired by modern chat applications.
+Noctra is an open-source community communication platform inspired by modern chat applications.
 
 The goal of this project is not to fully clone Discord, but to build a small, understandable and extensible communication platform with servers, channels, realtime messaging and, later, voice rooms.
 
@@ -40,7 +40,7 @@ The planned technical stack is:
 ## Repository structure
 
 ```txt
-openguild/
+noctra/
 ├── apps/
 │   ├── web/
 │   └── api/
@@ -137,7 +137,7 @@ pnpm dev:api
 Use `pnpm db:down` to stop PostgreSQL while preserving its data, or `pnpm db:logs`
 to inspect logs. Port conflicts and Windows/WSL setup are covered in the guide.
 
-OpenGuild uses PostgreSQL and Prisma. Create a local PostgreSQL database and role,
+Noctra uses PostgreSQL and Prisma. Create a local PostgreSQL database and role,
 then copy the example configuration and adjust its development credentials:
 
 ```bash

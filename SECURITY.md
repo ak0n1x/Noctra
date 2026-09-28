@@ -1,10 +1,11 @@
 # Security Policy
 
-Security is an important part of OpenGuild.
+Security is an important part of Noctra.
 
-OpenGuild is currently experimental and should not be considered production-ready.
+Noctra is currently experimental and should not be considered production-ready.
 
 The goal of this document is to explain the current security status of the project, the security goals, the known limitations and the expectations for contributors.
+
 
 ## Supported versions
 
@@ -16,7 +17,7 @@ No stable version is currently supported.
 
 ## Security goals
 
-OpenGuild aims to progressively implement the following security measures:
+Noctra aims to progressively implement the following security measures:
 
 - secure password hashing;
 - strict input validation;
@@ -54,7 +55,7 @@ The following features are not implemented yet:
 - dependency scanning;
 - production deployment hardening.
 
-Because of this, OpenGuild should not be deployed publicly yet.
+Because of this, Noctra should not be deployed publicly yet.
 
 ## Authentication requirements
 
@@ -271,7 +272,7 @@ Security-related pull requests should explain:
 
 ## Known limitations
 
-OpenGuild currently does not provide:
+Noctra currently does not provide:
 
 - production-ready authentication;
 - end-to-end encryption;
@@ -287,6 +288,6 @@ These limitations should be addressed progressively and documented as the projec
 
 ## License and openness
 
-OpenGuild is licensed under the GNU Affero General Public License v3.0 or later.
+Noctra is licensed under the GNU Affero General Public License v3.0 or later.
 
 The license was chosen to help ensure that modified versions of the project remain open source, including when the software is used to provide a network service.

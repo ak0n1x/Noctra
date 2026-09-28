@@ -32,7 +32,7 @@ the loopback interface. The API remains bound to `127.0.0.1`.
 curl http://127.0.0.1:3001
 ```
 
-Expect `{"name":"OpenGuild API","status":"ok"}`. Use the
+Expect `{"name":"Noctra API","status":"ok"}`. Use the
 [authentication examples](./authentication-flow.md#manual-verification) to register,
 log in and call `/auth/me`. In a separate terminal run `pnpm dev:web` for the frontend.
 

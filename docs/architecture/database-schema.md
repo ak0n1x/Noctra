@@ -1,6 +1,6 @@
 # Database Schema
 
-OpenGuild uses PostgreSQL for relational constraints, transactions and indexed queries.
+Noctra uses PostgreSQL for relational constraints, transactions and indexed queries.
 Prisma provides a typed client and versioned schema migrations for the NestJS API.
 The schema lives in `apps/api/prisma/schema.prisma`.
 

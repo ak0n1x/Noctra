@@ -1,6 +1,6 @@
 # Secrets Management
 
-OpenGuild uses environment variables for configuration and secrets. Real secret
+Noctra uses environment variables for configuration and secrets. Real secret
 files must not be committed.
 
 ## Example file
