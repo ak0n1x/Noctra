@@ -6,7 +6,6 @@ Noctra is currently experimental and should not be considered production-ready.
 
 The goal of this document is to explain the current security status of the project, the security goals, the known limitations and the expectations for contributors.
 
-
 ## Supported versions
 
 No stable version is currently supported.

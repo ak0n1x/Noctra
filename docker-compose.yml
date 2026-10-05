@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: noctra-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: openguild
+      POSTGRES_PASSWORD: openguild
+      POSTGRES_DB: openguild
+    ports:
+      - "5433:5432"
+    volumes:
+      - noctra_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openguild -d openguild"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  noctra_postgres_data:
