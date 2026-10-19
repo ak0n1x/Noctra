@@ -175,6 +175,83 @@ Run `pnpm --filter api test` for isolated authentication tests. See the
 secret generation and current limitations. Refresh tokens, rate limiting and frontend
 authentication are not implemented yet.
 
+## Current status
+
+Noctra is currently in active development.
+
+### Implemented
+
+- pnpm monorepo structure
+- Next.js frontend application
+- NestJS backend API
+- PostgreSQL database with Prisma
+- JWT authentication backend:
+  - register
+  - login
+  - protected `/auth/me`
+- Argon2 password hashing
+- input validation
+- Docker-based PostgreSQL development setup
+- project renamed from OpenGuild to Noctra
+- first Noctra frontend prototype:
+  - landing page
+  - login page
+  - register page
+  - app dashboard
+  - space layout
+  - channel layout
+  - member sidebar
+  - message composer
+  - create channel modal
+  - profile settings
+- frontend currently uses mock data
+
+### Verified
+
+The following have been tested successfully:
+
+- PostgreSQL connection
+- Prisma migrations
+- API startup
+- `GET /` returns:
+
+```json
+{
+  "name": "Noctra API",
+  "status": "ok"
+}
+````
+
+* backend authentication endpoints
+* frontend development server
+* formatting
+* linting
+* TypeScript checks
+* production builds
+
+### Current development point
+
+The frontend prototype is implemented, but it is not yet connected to the real backend.
+
+The next major step is to connect the frontend authentication flow to the existing API:
+
+* connect `/register` to `POST /auth/register`
+* connect `/login` to `POST /auth/login`
+* retrieve the authenticated user with `GET /auth/me`
+* protect application routes
+* add logout
+* replace mock user data progressively with real API data
+
+After authentication integration, development will continue with:
+
+* real spaces and memberships
+* channels
+* messages
+* realtime messaging with Socket.IO
+* uploads
+* moderation
+* voice channels
+
 ## Contributing
 
 Contributions are welcome.
